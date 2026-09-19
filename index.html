@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestra Boda | Ana & Cristian</title>
+    <!-- Tipografías elegantes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+    --bg-cream: #fbf8f5;
+    --card-bg: #ffffff;
+    --rose-soft: #ebdcd6;
+    --gold-accent: #c59b6c;
+    --text-dark: #3a332d;
+    --text-muted: #7d7268;
+    --font-serif: 'Cormorant Garamond', serif;
+    --font-script: 'Alex Brush', cursive;
+    --font-sans: 'Montserrat', sans-serif;
+    }
+
+    * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    }
+
+    body {
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    line-height: 1.6;
+    }
+
+    /* Canvas de Pétalos Flotantes */
+    #petals-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 999;
+    }
+
+    /* PANTALLA DE APERTURA */
+    #welcome-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: radial-gradient(circle, #fcf9f7 0%, #ecdcd3 100%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    text-align: center;
+    padding: 20px;
+    }
+
+    #welcome-screen.hidden {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+    }
+
+    .monogram-circle {
+    width: 95px;
+    height: 95px;
+    border: 1px solid var(--gold-accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    color: var(--gold-accent);
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(197, 155, 108, 0.15);
+    animation: pulse 2.5s infinite;
+    }
+
+    @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    }
+
+    .btn-open {
+    margin-top: 30px;
+    padding: 14px 38px;
+    background: #ffffff;
+    color: var(--text-dark);
+    border: 1px solid var(--gold-accent);
+    border-radius: 40px;
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    }
+
+    .btn-open:hover {
+    background: var(--gold-accent);
+    color: #fff;
+    }
+
+    /* CONTENEDOR PRINCIPAL MOBILE */
+    .app-container {
+    max-width: 520px;
+    margin: 0 auto;
+    background: #ffffff;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.05);
+    position: relative;
+    }
+
+    /* BOTÓN FLOTANTE MÚSICA */
+    .music-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 50px;
+    height: 50px;
+    background: #ffffff;
+    border: 1px solid var(--gold-accent);
+    border-radius: 50%;
+    color: var(--gold-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    cursor: pointer;
+    z-index: 900;
+    }
+
+    .music-btn.playing i {
+    animation: spin 6s linear infinite;
+    }
+
+    @keyframes spin {
+    100% { transform: rotate(360deg); }
+    }
+
+    /* HERO SECTION */
+    .hero {
+    position: relative;
+    height: 85vh;
+    min-height: 550px;
+    background: url('img/portada2.jpeg') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 50px;
+    text-align: center;
+    }
+
+    .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.95) 10%, rgba(255, 255, 255, 0.4) 60%, rgba(0, 0, 0, 0.2) 100%);
+    }
+
+    .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 20px;
+    }
+
+    .subtitle-top {
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    }
+
+    .names {
+    font-family: var(--font-script);
+    font-size: 3.8rem;
+    color: var(--text-dark);
+    line-height: 1.1;
+    margin-bottom: 15px;
+    }
+
+    .date-badge {
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    color: var(--gold-accent);
+    border-top: 1px solid var(--gold-accent);
+    border-bottom: 1px solid var(--gold-accent);
+    padding: 6px 20px;
+    display: inline-block;
+    }
+
+    /* SECCIONES Y ADORNOS */
+    section {
+    padding: 50px 25px;
+    text-align: center;
+    }
+
+    .section-title {
+    font-family: var(--font-serif);
+    font-size: 2.1rem;
+    color: var(--text-dark);
+    font-weight: 400;
+    }
+
+    .divider-botanical {
+    margin: 15px auto 25px;
+    width: 70px;
+    height: 1px;
+    background: var(--gold-accent);
+    position: relative;
+    }
+
+    .divider-botanical::after {
+    content: "✦";
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    padding: 0 5px;
+    color: var(--gold-accent);
+    font-size: 0.8rem;
+    }
+
+    /* CARRUSEL DE FOTOS */
+    .carousel-container {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 10px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+
+    .carousel-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    }
+
+    .carousel-slide.active {
+    opacity: 1;
+    }
+
+    .carousel-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    }
+
+    .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dark);
+    transition: background 0.3s;
+    z-index: 10;
+    }
+
+    .carousel-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    }
+
+    .carousel-btn.prev { left: 12px; }
+    .carousel-btn.next { right: 12px; }
+
+    /* CUENTA REGRESIVA */
+    .countdown-phrase {
+    font-family: var(--font-serif);
+    font-size: 1.45rem;
+    color: var(--gold-accent);
+    margin-bottom: 20px;
+    font-weight: 600;
+    }
+
+    .countdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    }
+
+    .countdown-item {
+    background: #ffffff;
+    padding: 14px 6px;
+    border-radius: 12px;
+    border: 1px solid var(--rose-soft);
+    }
+
+    .countdown-number {
+    display: block;
+    font-family: var(--font-serif);
+    font-size: 1.8rem;
+    color: var(--gold-accent);
+    font-weight: 600;
+    line-height: 1.1;
+    }
+
+    .countdown-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    }
+
+    /* TARJETAS EVENTOS */
+    .event-card {
+    background: #ffffff;
+    border: 1px solid #f0e6e0;
+    border-radius: 16px;
+    padding: 30px 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .event-icon {
+    font-size: 2rem;
+    color: var(--gold-accent);
+    margin-bottom: 12px;
+    }
+
+    .event-time {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--gold-accent);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    }
+
+    .btn-action {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 11px 26px;
+    background: var(--bg-cream);
+    color: var(--text-dark);
+    text-decoration: none;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border: 1px solid var(--gold-accent);
+    border-radius: 30px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    cursor: pointer;
+    }
+
+    .btn-action:hover {
+    background: var(--gold-accent);
+    color: #fff;
+    }
+
+    /* CAJA DE DATOS BANCARIOS Y TARJETA */
+    .bank-box {
+    background: var(--bg-cream);
+    border: 1px dashed var(--gold-accent);
+    padding: 20px;
+    border-radius: 14px;
+    margin: 20px 0;
+    text-align: left;
+    font-size: 0.9rem;
+    }
+
+    .bank-box p {
+    margin-bottom: 8px;
+    }
+
+    /* FORMULARIO RSVP */
+    .rsvp-form {
+    text-align: left;
+    margin-top: 20px;
+    }
+
+    .form-group {
+    margin-bottom: 18px;
+    }
+
+    .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+    font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--rose-soft);
+    border-radius: 10px;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background: #ffffff;
+    outline: none;
+    transition: border 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+    border-color: var(--gold-accent);
+    }
+
+    .btn-whatsapp {
+    width: 100%;
+    background: #25d366;
+    color: #ffffff;
+    border: none;
+    padding: 14px;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-radius: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.25);
+    transition: background 0.3s;
+    }
+
+    .btn-whatsapp:hover {
+    background: #1ebc59;
+    }
+
+    footer {
+    padding: 35px 20px;
+    background: #fdfbf9;
+    border-top: 1px solid var(--rose-soft);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    }
+</style>
+</head>
+<body>
+
+<!-- PÉTALOS FLOTANTES -->
+<canvas id="petals-canvas"></canvas>
+
+<!-- PANTALLA DE APERTURA -->
+<div id="welcome-screen">
+    <div class="monogram-circle">A & C</div>
+    <p class="subtitle-top">Nuestra Boda</p>
+    <h1 style="font-family: var(--font-serif); font-size: 2.6rem; margin-top: 5px;">Ana &amp; Cristian</h1>
+    <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 10px;">Tenemos una hermosa noticia para compartir con ustedes</p>
+    <button class="btn-open" id="open-invitation">Abrir Invitación</button>
+</div>
+
+<!-- AUDIO DE FONDO -->
+<audio id="bg-music" loop preload="auto">
+    <source src="audio/Christina Perri - A Thousand Years.mp3" type="audio/mpeg">
+</audio>
+
+<!-- BOTÓN FLOTANTE MÚSICA -->
+<button class="music-btn" id="music-toggle" title="Música">
+    <i class="fa-solid fa-music"></i>
+</button>
+
+<div class="app-container">
+    
+    <!-- HERO -->
+    <header class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <p class="subtitle-top">¡Nos Casamos!</p>
+        <h1 class="names">Ana & Cristian</h1>
+        <div class="date-badge">21 · NOVIEMBRE · 2026</div>
+    </div>
+    </header>
+
+    <!-- FRASE INICIAL -->
+    <section>
+    <div class="divider-botanical"></div>
+    <p style="font-family: var(--font-serif); font-size: 1.4rem; font-style: italic; color: var(--text-dark); line-height: 1.7;">
+        "Dicen que cuando encuentras a la persona correcta, el corazón lo sabe. Nosotros lo supimos y hoy queremos celebrar nuestro amor rodeado de las personas más importantes en nuestras vidas"
+    </p>
+    </section>
+
+    <!-- CARRUSEL DE FOTOS (4 FOTOS) -->
+    <section style="padding-top: 10px;">
+    <h2 class="section-title">Nuestra Historia</h2>
+    <div class="divider-botanical"></div>
+
+    <div class="carousel-container">
+        <!-- Foto 1 -->
+        <div class="carousel-slide active">
+            <img src="img/2.jpeg" alt="Momento juntos 1">
+        </div>
+        <!-- Foto 2 -->
+        <div class="carousel-slide">
+            <img src="img/portada.jpeg" alt="Momento juntos 2">
+        </div>
+        <!-- Foto 3 -->
+        <div class="carousel-slide">
+            <img src="img/3.jpeg" alt="Momento juntos 3">
+        </div>
+        <!-- Foto 4 -->
+        <div class="carousel-slide">
+            <img src="img/4.jpeg" alt="Momento juntos 4">
+        </div>
+        <!-- Foto 5 -->
+        <div class="carousel-slide">
+            <img src="img/7.jpeg" alt="Momento juntos 5">
+        </div>
+        <!-- Foto 6 -->
+        <div class="carousel-slide">
+            <img src="img/5.jpeg" alt="Momento juntos 6">
+        </div>
+        <!-- Foto 7 -->
+        <div class="carousel-slide">
+            <img src="img/10.jpeg" alt="Momento juntos 6">
+        </div>
+        <!-- Foto 8 -->
+        <div class="carousel-slide">
+            <img src="img/6.jpeg" alt="Momento juntos 6">
+        </div>
+
+        <!-- Botones carrusel -->
+        <button class="carousel-btn prev" id="prevSlide"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="carousel-btn next" id="nextSlide"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+    </section>
+
+    <!-- CUENTA REGRESIVA CON FRASE PERSONALIZADA -->
+    <section style="background: #faf6f2; border-radius: 24px; margin: 0 15px;">
+        <p class="countdown-phrase" id="countdown-phrase">Faltan ... días para nuestro ¡Sí, Acepto!</p>
+        <div class="divider-botanical" style="margin-top: -10px;"></div>
+        <div class="countdown-grid">
+            <div class="countdown-item">
+                <span class="countdown-number" id="days">00</span>
+                <span class="countdown-label">Días</span>
+            </div>
+            <div class="countdown-item">
+                <span class="countdown-number" id="hours">00</span>
+                <span class="countdown-label">Hs</span>
+        </div>
+        <div class="countdown-item">
+            <span class="countdown-number" id="minutes">00</span>
+            <span class="countdown-label">Min</span>
+        </div>
+        <div class="countdown-item">
+            <span class="countdown-number" id="seconds">00</span>
+            <span class="countdown-label">Seg</span>
+        </div>
+    </div>
+    </section>
+
+    <!-- CEREMONIA Y RECEPCIÓN CON GOOGLE MAPS -->
+    <section>
+        <h2 class="section-title">Dónde & Cuándo</h2>
+        <div class="divider-botanical"></div>
+
+    <!-- Recepción / Fiesta -->
+    <div class="event-card">
+        <i class="fa-solid fa-champagne-glasses event-icon"></i>
+        <h3 style="font-family: var(--font-serif); font-size: 1.8rem;">Recepción</h3>
+        <p class="event-time"><i class="fa-regular fa-clock" style="margin-right: 5px;"></i> 21:30 HS</p>
+            <!-- Detalle de Buffet y Puntualidad -->
+            <div style="background: var(--bg-cream); border-radius: 12px; padding: 14px; margin: 18px 0 10px; border: 1px solid var(--rose-soft);">
+                <p style="font-size: 0.9rem; font-weight: 600; color: var(--gold-accent); margin-bottom: 4px;">
+            Buffet Libre de Bienvenida
+                </p>
+        <p style="font-size: 0.85rem; color: var(--text-dark); line-height: 1.5;">
+            Los esperamos puntualmente para disfrutar juntos de la recepción desde el inicio.
+        </p>
+    </div>
+        <p style="font-weight: 500;">Salón Las Maria's Multiespacio</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">C. Estrecho San Carlos, G4200 Maco, Santiago del Estero</p>
+
+        <a href="https://maps.app.goo.gl/QDrzyY6HeY9Ea3Do9" target="_blank" class="btn-action">
+        <i class="fa-solid fa-map-location-dot" style="margin-right: 6px;"></i> Ver en Google Maps
+        </a>
+    </div>
+
+    <!-- Ceremonia -->
+    <div class="event-card">
+        <i class="fa-solid fa-church event-icon"></i>
+        <h3 style="font-family: var(--font-serif); font-size: 1.8rem;">Ceremonia</h3>
+        <p class="event-time"><i class="fa-regular fa-clock" style="margin-right: 5px;"></i> 22:00 HS</p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">"El amor nos encontró, el tiempo nos unió y hoy elegimos caminar juntos para siempre"</p>
+    </div>
+    </section>
+
+    <!-- Dress Code-->
+
+    <section style="background: #faf6f2; border-radius: 24px; margin: 0 15px; padding: 40px 20px;">
+        <i class="fa-solid fa-vest-patches" style="font-size: 2.2rem; color: var(--gold-accent); margin-bottom: 12px;"></i>
+        <h2 class="section-title">Dress Code</h2>
+        <div class="divider-botanical"></div>
+        <p style="font-size: 1.3rem; font-family: var(--font-serif); font-weight: 600; color: var(--text-dark); letter-spacing: 1px;">
+        Elegante / Formal
+    </p>
+    <div style="background: #ffffff; border: 1px dashed var(--gold-accent); border-radius: 14px; padding: 18px; margin: 20px auto 0; max-width: 380px;">
+        <p style="font-size: 0.95rem; font-weight: 600; color: var(--gold-accent); margin-bottom: 5px;">
+            <i class="fa-solid fa-circle-exclamation" style="margin-right: 5px;"></i> Nota importante
+        </p>
+        <p style="font-size: 0.9rem; color: var(--text-dark); line-height: 1.5;"> Por favor, <strong>no vestir de blanco</strong> ni colores similares, ya que están reservados exclusivamente para la novia.
+        </p>
+    </div>
+    </section>
+
+    <!--  SOLO ADULTOS (NO NIÑOS) -->
+    <section style="background: #faf6f2; border-radius: 24px; margin: 0 15px; padding: 40px 20px;">
+        <i class="fa-solid fa-martini-glass-citrus" style="font-size: 2.2rem; color: var(--gold-accent); margin-bottom: 12px;"></i>
+        <h2 class="section-title">Solo Adultos</h2>
+        <div class="divider-botanical"></div>
+        <p style="font-size: 0.95rem; color: var(--text-muted); max-width: 360px; margin: 0 auto; line-height: 1.7;">
+        Amamos a los niños, pero queremos que este día disfrutes y te relajes al máximo. Por eso, hemos preparado una <strong>celebración exclusivamente para adultos</strong> (sin niños). ¡Agradecemos tu comprensión!
+        </p>
+    </section>
+
+    <!-- TARJETA DEL EVENTO Y DATOS BANCARIOS -->
+    <section>
+        <i class="fa-solid fa-receipt" style="font-size: 2rem; color: var(--gold-accent); margin-bottom: 10px;"></i>
+        <h2 class="section-title">Valor de la Tarjeta</h2>
+    <div class="divider-botanical"></div>
+    <p style="font-size: 1.35rem; font-weight: 600; color: var(--gold-accent);">
+        $ 75.000 por persona
+    </p>
+
+    <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px; line-height: 1.6; max-width: 380px; margin-left: auto; margin-right: auto;">
+        Pensando en tu comodidad, podes realizar <strong>pagos parciales y completar el importe</strong> hasta el <strong>06/11</strong> inclusive.
+    </p>
+
+    <div class="bank-box">
+        <p><strong>Banco:</strong> Mercado Pago</p>
+        <p><strong>Titular:</strong> Ana Laura Maguna</p>
+        <p><strong>Alias:</strong> <span id="alias-text">ana-cristian</span></p>
+        <p><strong>CBU:</strong> <span id="cbu-text">0000003100011420594620</span></p>
+    </div>
+
+    <div style="display: flex; gap: 10px; justify-content: center;">
+        <button class="btn-action" id="copy-alias-btn" style="margin-top: 0;">
+            <i class="fa-regular fa-copy"></i> Copiar Alias
+        </button>
+        <button class="btn-action" id="copy-cbu-btn" style="margin-top: 0;">
+            <i class="fa-regular fa-copy"></i> Copiar CBU
+        </button>
+    </div>
+    </section>
+
+    <!-- FORMULARIO RSVP / ASISTENCIA VÍA WHATSAPP -->
+    <section style="background: #faf6f2; border-radius: 24px; margin: 0 15px 40px; padding: 40px 25px;">
+        <i class="fa-regular fa-envelope-open" style="font-size: 2.2rem; color: var(--gold-accent); margin-bottom: 10px;"></i>
+        <h2 class="section-title">Confirmar Asistencia</h2>
+        <div class="divider-botanical"></div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;"> 
+            Por favor completa el formulario antes del 06/11 para confirmar tu lugar:
+        </p>
+        <form class="rsvp-form" id="rsvp-form">
+        <!-- Nombre y Apellido -->
+        <div class="form-group">
+          <label for="guest-name">Nombre y Apellido *</label>
+        <input type="text" id="guest-name" placeholder="Ej: Martín Pérez" required>
+        </div>
+
+        <!-- Elegir destinatario -->
+        <div class="form-group">
+          <label for="rsvp-recipient">¿A quién deseas confirmar? *</label>
+        <select id="rsvp-recipient" required>
+            <option value="novia">A la Novia</option>
+            <option value="novio">Al Novio</option>
+        </select>
+        </div>
+
+        <!-- Asistencia -->
+        <div class="form-group">
+          <label for="guest-attendance">¿Podrás asistir? *</label>
+        <select id="guest-attendance" required>
+            <option value="Sí, confirmo con gusto">¡Sí, allí estaré!</option>
+            <option value="No podré asistir">Lamentablemente no podré asistir</option>
+        </select>
+        </div>
+
+        <!-- Cantidad de personas -->
+        <div class="form-group" id="guests-count-group">
+          <label for="guest-count">Cantidad de personas *</label>
+        <select id="guest-count">
+            <option value="1">1 persona</option>
+            <option value="2">2 personas</option>
+            <option value="3">3 personas</option>
+            <option value="4">4 personas</option>
+            <option value="5">5 personas</option>
+        </select>
+        </div>
+
+        <!-- Menú especial / Restricciones alimentarias -->
+        <div class="form-group" id="diet-group">
+        <label for="guest-diet">Menú especial o restricciones alimentarias</label>
+        <select id="guest-diet">
+            <option value="Ninguna (Menú tradicional)">Ninguna (Menú tradicional)</option>
+            <option value="Celíaco / TACC">Celíaco / TACC</option>
+            <option value="Vegetariano">Vegetariano</option>
+            <option value="Vegano">Vegano</option>
+            <option value="Otra condición">Otra condición (especificar abajo)</option>
+        </select>
+        </div>
+
+        <!-- Campo para aclarar si seleccionó "Otra condición" o si son varios -->
+        <div class="form-group" id="diet-detail-group">
+        <label for="guest-diet-detail">Detalle o aclaración adicional (opcional)</label>
+        <input type="text" id="guest-diet-detail" placeholder="Ej: Alergia a frutos secos / 1 celíaco y 1 vegetariano">
+        </div>
+
+        <button type="submit" class="btn-whatsapp">
+        <i class="fa-brands fa-whatsapp" style="font-size: 1.3rem;"></i> Enviar por WhatsApp
+        </button>
+    </form>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>Tu presencia es muy importante para nosotros. Por favor confirmanos tu asistencia lo antes posible</p>
+        <p style="margin-top: 8px; font-weight: 600; font-family: var(--font-serif); font-size: 1.2rem;">Ana &amp; Cristian</p>
+    </footer>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+    // 1. LLUVIA DE PÉTALOS
+    const canvas = document.getElementById('petals-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const petalCount = 26;
+    const petals = [];
+
+    class Petal {
+        constructor() { this.reset(); }
+        reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * -height;
+        this.size = Math.random() * 8 + 10;
+        this.speedY = Math.random() * 1.2 + 0.8;
+        this.speedX = Math.sin(Math.random() * 2) * 0.7;
+        this.angle = Math.random() * 360;
+        this.spin = Math.random() * 1.5 - 0.75;
+        this.opacity = Math.random() * 0.4 + 0.4;
+    }
+    update() {
+        this.y += this.speedY;
+        this.x += Math.sin(this.y * 0.005) + this.speedX;
+        this.angle += this.spin;
+        if (this.y > height + 20) this.reset();
+    }
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate((this.angle * Math.PI) / 180);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.size, this.size * 1.4, Math.PI / 4, 0, 2 * Math.PI);
+        ctx.fillStyle = `rgba(235, 190, 185, ${this.opacity})`;
+        ctx.fill();
+        ctx.restore();
+    }
+    }
+
+    for (let i = 0; i < petalCount; i++) petals.push(new Petal());
+
+    function animatePetals() {
+        ctx.clearRect(0, 0, width, height);
+        petals.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animatePetals);
+    }
+    animatePetals();
+
+    // 2. APERTURA Y MÚSICA
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const openBtn = document.getElementById('open-invitation');
+    const musicBtn = document.getElementById('music-toggle');
+    const audio = document.getElementById('bg-music');
+    let isPlaying = false;
+
+    openBtn.addEventListener('click', () => {
+        welcomeScreen.classList.add('hidden');
+        audio.play().then(() => {
+        isPlaying = true;
+        musicBtn.classList.add('playing');
+    }).catch(e => console.log('Autoplay bloqueado', e));
+    });
+
+    musicBtn.addEventListener('click', () => {
+        if (isPlaying) {
+        audio.pause();
+        musicBtn.classList.remove('playing');
+    } else {
+        audio.play();
+        musicBtn.classList.add('playing');
+    }
+    isPlaying = !isPlaying;
+    });
+
+    // 3. CARRUSEL DE FOTOS
+    const slides = document.querySelectorAll('.carousel-slide');
+    const nextBtn = document.getElementById('nextSlide');
+    const prevBtn = document.getElementById('prevSlide');
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === index);
+    });
+    }
+
+    nextBtn.addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    });
+
+    prevBtn.addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        showSlide(currentSlide);
+    });
+
+    // Cambio automático cada 4.5 segundos
+    setInterval(() => {
+        currentSlide = (currentSlide + 1) % slides.length;
+        showSlide(currentSlide);
+    }, 4500);
+
+    // 4. CUENTA REGRESIVA CON FRASE PERSONALIZADA
+    const eventDate = new Date('2026-11-21T22:00:00').getTime();
+    const phraseElem = document.getElementById('countdown-phrase');
+
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = eventDate - now;
+    if (distance < 0) {
+        phraseElem.innerText = "¡Llegó el gran día de nuestro... ¡Sí, Acepto!";
+        document.getElementById('days').innerText = "00";
+        document.getElementById('hours').innerText = "00";
+        document.getElementById('minutes').innerText = "00";
+        document.getElementById('seconds').innerText = "00";
+        return;
+    }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % 1000) / 1000);
+
+    phraseElem.innerText = `Faltan ${days} días para nuestro: ¡Sí, Acepto!`;
+
+    document.getElementById('days').innerText = String(days).padStart(2, '0');
+    document.getElementById('hours').innerText = String(hours).padStart(2, '0');
+    document.getElementById('minutes').innerText = String(minutes).padStart(2, '0');
+    document.getElementById('seconds').innerText = String(seconds).padStart(2, '0');
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // 5. COPIAR ALIAS Y CBU
+    function setupCopyBtn(buttonId, textId, successMsg) {
+        const btn = document.getElementById(buttonId);
+        const text = document.getElementById(textId).innerText;
+        btn.addEventListener('click', () => {
+        navigator.clipboard.writeText(text).then(() => {
+            const original = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> ${successMsg}`;
+            setTimeout(() => btn.innerHTML = original, 2000);
+        });
+    });
+    }
+    setupCopyBtn('copy-alias-btn', 'alias-text', 'Alias copiado');
+    setupCopyBtn('copy-cbu-btn', 'cbu-text', 'CBU copiado');
+
+    // 6. FORMULARIO RSVP Y ENVÍO A WHATSAPP
+    const rsvpForm = document.getElementById('rsvp-form');
+    const attendanceSelect = document.getElementById('guest-attendance');
+    const countGroup = document.getElementById('guests-count-group');
+    const dietGroup = document.getElementById('diet-group');
+    const dietDetailGroup = document.getElementById('diet-detail-group');
+
+    // Ocultar opciones de menú y cantidad si responde que no asiste
+    attendanceSelect.addEventListener('change', () => {
+    const isAttending = attendanceSelect.value !== 'No podré asistir';
+    countGroup.style.display = isAttending ? 'block' : 'none';
+    dietGroup.style.display = isAttending ? 'block' : 'none';
+    dietDetailGroup.style.display = isAttending ? 'block' : 'none';
+    });
+
+    rsvpForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+      // NÚMEROS DE TELÉFONO (Colocar números reales con código de país)
+    const PHONE_NOVIA = "5493855060098"; 
+    const PHONE_NOVIO = "5493855843888";
+
+    const recipient = document.getElementById('rsvp-recipient').value;
+    const targetPhone = (recipient === 'novio') ? PHONE_NOVIO : PHONE_NOVIA;
+
+    const name = document.getElementById('guest-name').value.trim();
+    const attendance = document.getElementById('guest-attendance').value;
+    const count = document.getElementById('guest-count').value;
+    const diet = document.getElementById('guest-diet').value;
+    const dietDetail = document.getElementById('guest-diet-detail').value.trim();
+
+      // Mensaje con estrellas y corazones
+      let message = `✨❤️ *CONFIRMACIÓN DE ASISTENCIA* ❤️✨%0A`;
+    message += `¡Hola Ani y Cris ❤️! Te comparto mi respuesta para la boda 🌟%0A%0A`;
+    message += `👤 *Nombre:* ${encodeURIComponent(name)}%0A`;
+    message += `💌 *Asistencia:* ${encodeURIComponent(attendance)}%0A`;
+
+    if (attendance !== 'No podré asistir') {
+        message += `👥 *Cantidad de personas:* ${encodeURIComponent(count)}%0A`;
+        message += `🍽️ *Preferencia alimentaria:* ${encodeURIComponent(diet)}%0A`;
+        
+        if (dietDetail !== "") {
+          message += `📝 *Detalle menú:* ${encodeURIComponent(dietDetail)}%0A`;
+        }
+        
+        message += `%0A✨ ¡Nos vemos pronto para celebrar juntos! 🥂❤️`;
+    } else {
+        message += `%0A💫 ¡Muchas gracias por la invitación y les deseo lo mejor! ❤️`;
+    }
+
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${targetPhone}&text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    });
+</script>
+</body>
+</html>
